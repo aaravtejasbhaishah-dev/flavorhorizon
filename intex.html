@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flavor Horizon | Multi-Cuisine Restaurant Mumbai</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+  <!-- React & ReactDOM (Production CDNs) -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel Standalone to compile JSX in browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .font-serif {
+      font-family: 'Playfair Display', serif;
+    }
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spinSlow 20s linear infinite;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.35s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-[#FDFBF7] text-slate-800 antialiased selection:bg-amber-100 selection:text-amber-900">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // ============================================================================
+    // MENU DATA (10 Beautifully Curated Pages)
+    // ============================================================================
+    const menuPages = [
+      {
+        pageNumber: 1,
+        title: "The Horizon's Beginning",
+        subtitle: "Chef's Welcome & Notes",
+        description: "Welcome to Flavor Horizon, Mumbai. Our culinary philosophy balances the bold, traditional spices of India with the rustic charm of Italy and the vibrant zest of Mexico. Under the guidance of our culinary artisans, every dish is crafted to perfection. We take immense pride in hosting a completely separated kitchen zone dedicated solely to our pure Jain preparations, ensuring ultimate peace of mind.",
+        items: [
+          { name: "Saffron Mist Welcome Drink", price: 195, desc: "A refreshing welcome elixir of Kashmiri saffron, fresh mint, and sparkling lime.", tags: ["Jain", "Vegan"] },
+          { name: "The Horizon Amuse-Bouche", price: 220, desc: "Crisp potato-skin cup filled with spiced edamame mash and microgreens.", tags: ["Chef's Special"] },
+          { name: "Jain Amuse-Bouche", price: 220, desc: "Crisp cucumber cups filled with herb-infused cream cheese and pomegranate pearls.", tags: ["Jain", "Chef's Special"] }
+        ]
+      },
+      {
+        pageNumber: 2,
+        title: "Liquid Horizons",
+        subtitle: "Artisanal Mocktails & Brews",
+        description: "Cool down and elevate your palate with our signature fusion beverages, expertly shaken with fresh Mumbai herbs and international syrups.",
+        items: [
+          { name: "Jamun & Rosemary Collins", price: 295, desc: "Indigenous black plum pulp shaken with fresh rosemary, lime, and sparkling water.", tags: ["Jain", "Vegan"] },
+          { name: "Spiced Guava Margarita (Zero Proof)", price: 310, desc: "Pink guava juice, Mexican chili salt rim, fresh lime, and triple sec syrup.", tags: ["Jain", "Vegan"] },
+          { name: "Cardamom & Basil Iced Latte", price: 280, desc: "Cold brewed espresso sweetened with house cardamom syrup, fresh basil leaves, and almond milk.", tags: ["Jain", "Vegan"] },
+          { name: "Kesar Thandai Frappe", price: 325, desc: "Rich almond and melon-seed milk blend, infused with saffron threads and crushed pistachios.", tags: ["Jain"] },
+          { name: "Chipotle Pineapple Fizz", price: 295, desc: "Charred pineapple syrup, chipotle smoked salt, sparkling soda, and fresh mint.", tags: ["Jain", "Vegan"] }
+        ]
+      },
+      {
+        pageNumber: 3,
+        title: "Indian Shuruaat",
+        subtitle: "Soups & Clay Oven Starters",
+        description: "Smoked, charred, and steamed appetizers celebrating local and northern Indian culinary heritage.",
+        items: [
+          { name: "Tandoori Broccoli Florets", price: 425, desc: "Broccoli marinated in mustard oil, yellow chili spice, and Greek yogurt, charred in the clay oven.", tags: ["Jain", "Spicy"] },
+          { name: "Horizon Paneer Tikka", price: 460, desc: "Double-layered cottage cheese stuffed with mint chutney, marinated in heritage tandoor spices.", tags: ["Spicy"] },
+          { name: "Sufiyana Paneer Tikka (Jain)", price: 460, desc: "Soft cottage cheese marinated in cashew-cream paste, fennel seeds, and green cardamom.", tags: ["Jain"] },
+          { name: "Shahi Tomato Shorba", price: 260, desc: "Light, velvety tomato broth infused with fresh coriander stems, cumin, and gold leaf.", tags: ["Jain", "Vegan"] },
+          { name: "Corn and Water Chestnut Kebabs", price: 410, desc: "Crispy pan-seared patties made with sweet corn, crunchy water chestnut, and mild spices.", tags: ["Jain"] }
+        ]
+      },
+      {
+        pageNumber: 4,
+        title: "Italian Appetizers",
+        subtitle: "Antipasti & Handmade Pastas",
+        description: "Rustic Italian flavors recreated with premium durum wheat and freshly made sauces.",
+        items: [
+          { name: "Classic Tomato Bruschetta", price: 380, desc: "Toasted sourdough rubbed with garlic (skipped for Jain), topped with heirloom tomatoes, fresh basil, and extra virgin olive oil.", tags: ["Jain Available", "Vegan"] },
+          { name: "Truffle Mushroom Risotto", price: 595, desc: "Slow-cooked Arborio rice with wild porcini mushrooms, parmesan cheese, and black truffle oil drizzle.", tags: [] },
+          { name: "Zucchini & Bell Pepper Risotto (Jain)", price: 575, desc: "Creamy Arborio rice with yellow zucchini, red bell pepper, and fresh basil, cooked in a rich butter-parmesan stock.", tags: ["Jain"] },
+          { name: "Pesto Gnocchi", price: 520, desc: "Hand-rolled potato gnocchi tossed in a creamy pine nut and fresh basil pesto sauce.", tags: [] },
+          { name: "Spinach & Ricotta Ravioli", price: 560, desc: "Fresh house-made pasta pockets filled with ricotta, organic spinach, tossed in a burnt butter and sage sauce.", tags: ["Jain"] }
+        ]
+      },
+      {
+        pageNumber: 5,
+        title: "Mexican Fiesta",
+        subtitle: "Tacos, Quesadillas & Enchiladas",
+        description: "Vibrant and smoky Mexican classics served with house-made salsas and fresh guacamole.",
+        items: [
+          { name: "Smoked Chipotle Tacos", price: 395, desc: "Soft corn tortillas with grilled cottage cheese, charred corn salsa, chipotle mayo, and pickled onions.", tags: ["Spicy"] },
+          { name: "Jain Avocat Tacos", price: 415, desc: "Crisp lettuce shell with fresh avocado cubes, sweet corn, sour cream, and fresh cilantro-lime dressing.", tags: ["Jain"] },
+          { name: "Horizon Quesadilla", price: 440, desc: "Flour tortilla loaded with Monterrey Jack cheese, black beans, bell peppers, and jalapeños.", tags: ["Jain Available"] },
+          { name: "Enchiladas Verdes", price: 495, desc: "Corn tortillas rolled with spiced cottage cheese and beans, baked under a rich, tangy green tomatillo sauce and melted cheese.", tags: [] },
+          { name: "Fiesta Nachos Platter", price: 460, desc: "House-fried corn tortilla chips topped with cheese sauce, refried beans, pico de gallo, and fresh guacamole.", tags: ["Jain Available"] }
+        ]
+      },
+      {
+        pageNumber: 6,
+        title: "Indian Main - North",
+        subtitle: "Heritage Royal Gravies",
+        description: "Indulgent and complex curries curated from Lucknowi and Punjabi royal kitchens.",
+        items: [
+          { name: "Paneer Horizon Lababdar", price: 525, desc: "Charred cottage cheese cubes in a rich tomato, cashew, and onion gravy flavored with kasuri methi.", tags: ["Spicy"] },
+          { name: "Kesar Shahi Paneer (Jain)", price: 525, desc: "Paneer chunks in a smooth saffron-infused white gravy made of cashew paste, yogurt, and sweet spices.", tags: ["Jain"] },
+          { name: "Horizon Dal Bukhara", price: 445, desc: "Our pride: Whole black lentils slow-cooked for 24 hours with tomato puree, white butter, and cream.", tags: ["Jain"] },
+          { name: "Subz Dewani Handi", price: 480, desc: "Assorted seasonal vegetables tossed in a spinach and cashew gravy with fresh cream.", tags: ["Jain Available"] },
+          { name: "Amritsari Kulcha Platter", price: 420, desc: "Crispy, clay-oven baked flatbread stuffed with spiced potato & onion, served with dark chana masala and pickle.", tags: [] }
+        ]
+      },
+      {
+        pageNumber: 7,
+        title: "Indian Main - South & Coastal",
+        subtitle: "Deccan Plateau & Konkan Journeys",
+        description: "Exploring the coconut-rich, tangy, and aromatic curries of Southern and Coastal India.",
+        items: [
+          { name: "Malabar Coconut Curry", price: 495, desc: "Seasonal vegetables simmered in freshly squeezed coconut milk, raw mango, curry leaves, and mustard seeds.", tags: ["Jain", "Vegan"] },
+          { name: "Paneer Chettinad", price: 510, desc: "Cottage cheese cubes tossed in a fiery, freshly ground Chettinad spice paste with black pepper and coconut.", tags: ["Spicy"] },
+          { name: "Coorgi Mushroom Masala", price: 480, desc: "Button mushrooms cooked with signature roasted spices, tamarind pulp, and fresh coriander.", tags: ["Vegan"] },
+          { name: "Avial Horizon", price: 460, desc: "Traditional Kerala-style medley of native vegetables steamed with fresh coconut, green chilies, and coconut oil.", tags: ["Jain"] },
+          { name: "Neer Dosa Basket", price: 180, desc: "Four pieces of lacy, paper-thin rice crepes, perfect for soaking up rich coastal gravies.", tags: ["Jain", "Vegan"] }
+        ]
+      },
+      {
+        pageNumber: 8,
+        title: "Artisanal Breads & Rice",
+        subtitle: "Biryanis & Indian Flatbreads",
+        description: "Fluffy fragrant rice and fresh oven-baked breads crafted to complete your main course experience.",
+        items: [
+          { name: "Dum Pukht Subz Biryani", price: 495, desc: "Fragrant basmati rice layered with vegetables, saffron, rose water, and mint, cooked under puff-pastry purdah.", tags: ["Spicy"] },
+          { name: "Jain Shahi Biryani", price: 495, desc: "Aromatic basmati rice layered with green peas, sweet corn, saffron, and almonds, prepared without onions or garlic.", tags: ["Jain"] },
+          { name: "Butter & Garlic Naan Trio", price: 210, desc: "A combination of classic butter, roasted garlic, and coriander flatbreads baked in tandoor.", tags: [] },
+          { name: "Missi Roti (Jain)", price: 85, desc: "Gluten-free chickpea flour flatbread seasoned with cumin, dry fenugreek, and green chilies.", tags: ["Jain"] },
+          { name: "Jeera and Peas Pulao", price: 340, desc: "Long-grain basmati rice tossed in ghee with roasted cumin seeds and fresh green peas.", tags: ["Jain"] }
+        ]
+      },
+      {
+        pageNumber: 9,
+        title: "The Jain Horizon",
+        subtitle: "Strictly Root-Free Gastronomy",
+        description: "Our dedicated chef team ensures zero root vegetables, zero onion, and zero garlic are used in this curated selection. Prepared in our separate specialized kitchen space.",
+        items: [
+          { name: "Jain Tandoori Paneer Sashlik", price: 475, desc: "Cottage cheese blocks skewered with yellow bell peppers, zucchini, marinated in fresh mint, curd, and carom seeds.", tags: ["Jain"] },
+          { name: "Paneer Makhanwala (Pure Jain)", price: 520, desc: "Plump cottage cheese in a silky gravy made of fresh tomatoes, cashew paste, and butter, flavored with green cardamom.", tags: ["Jain"] },
+          { name: "Mekong Jain Fried Rice", price: 410, desc: "Fragrant jasmine rice tossed with broccoli, water chestnuts, baby corn, and organic gluten-free soy sauce.", tags: ["Jain", "Vegan"] },
+          { name: "Jain Penne Alfredo", price: 495, desc: "Penne pasta cooked in a rich, creamy fresh-milk sauce with broccoli florets, sweet corn, and heavy parmesan.", tags: ["Jain"] },
+          { name: "Jain Dal Panchmel", price: 395, desc: "A protein-rich blend of five lentils cooked with tomatoes, tempered with ghee, cumin, and hing.", tags: ["Jain"] }
+        ]
+      },
+      {
+        pageNumber: 10,
+        title: "Sweet Horizons",
+        subtitle: "Desserts & Sweet Endings",
+        description: "Decadent dessert masterpieces combining Indian sweets with global culinary techniques.",
+        items: [
+          { name: "Gulab Jamun Cheesecake", price: 360, desc: "Rich baked Philadelphia cream cheese layered over crumbled biscuits and saffron syrup-soaked gulab jamun.", tags: ["Chef's Special"] },
+          { name: "Deconstructed Tiramisu", price: 380, desc: "Espresso-soaked ladyfingers, rich mascarpone mousse, dusted with dark cocoa powder and edible gold leaf.", tags: ["Jain"] },
+          { name: "Churros with Spicy Chocolate", price: 340, desc: "Crispy Mexican deep-fried dough dusted with cinnamon sugar, served with warm dark chocolate dipping sauce infused with chipotle.", tags: ["Jain", "Vegan"] },
+          { name: "Elaneer Payasam", price: 320, desc: "A chilled, creamy South Indian dessert made with tender coconut pulp, condensed milk, and fresh cardamom.", tags: ["Jain"] },
+          { name: "Warm Apple Jalebi", price: 350, desc: "Crisp granny smith apple rings dipped in batter, fried golden, soaked in saffron syrup, served with cold rabdi.", tags: ["Jain"] }
+        ]
+      }
+    ];
+
+    function App() {
+      // Navigation & Page States
+      const [activeTab, setActiveTab] = useState('home'); 
+      const [menuPageIndex, setMenuPageIndex] = useState(0);
+      const [jainFilter, setJainFilter] = useState(false);
+      
+      // Reservation States
+      const [reserveName, setReserveName] = useState('');
+      const [reservePhone, setReservePhone] = useState('');
+      const [reserveGuests, setReserveGuests] = useState('2');
+      const [reserveDate, setReserveDate] = useState('');
+      const [reserveTime, setReserveTime] = useState('19:30');
+      const [reserveZone, setReserveZone] = useState('Standard'); 
+      const [reserveFoodType, setReserveFoodType] = useState('Standard'); 
+      const [isBooked, setIsBooked] = useState(false);
+      const [bookingRef, setBookingRef] = useState('');
+      const [bookingError, setBookingError] = useState('');
+
+      // Contact States
+      const [contactName, setContactName] = useState('');
+      const [contactEmail, setContactEmail] = useState('');
+      const [contactMessage, setContactMessage] = useState('');
+      const [isContactSent, setIsContactSent] = useState(false);
+
+      // Initialize Date for reservation
+      useEffect(() => {
+        const today = new Date();
+        today.setDate(today.getDate() + 1); 
+        const tomorrowStr = today.toISOString().split('T')[0];
+        setReserveDate(tomorrowStr);
+      }, []);
+
+      const handleBookTable = (e) => {
+        e.preventDefault();
+        setBookingError('');
+        if (!reserveName.trim() || !reservePhone.trim()) {
+          setBookingError("Please fill in both your full name and contact phone number.");
+          return;
+        }
+        const ref = 'FH-' + Math.floor(100000 + Math.random() * 900000);
+        setBookingRef(ref);
+        setIsBooked(true);
+      };
+
+      const handleContactSubmit = (e) => {
+        e.preventDefault();
+        if (!contactName || !contactEmail || !contactMessage) {
+          return;
+        }
+        setIsContactSent(true);
+        setTimeout(() => {
+          setContactName('');
+          setContactEmail('');
+          setContactMessage('');
+        }, 2500);
+      };
+
+      const resetBooking = () => {
+        setIsBooked(false);
+        setReserveName('');
+        setReservePhone('');
+        setBookingError('');
+      };
+
+      // Filter items based on "Jain Available" or "Jain Only"
+      const getFilteredItems = (items) => {
+        if (!jainFilter) return items;
+        return items.filter(item => 
+          item.tags.includes("Jain") || 
+          item.tags.includes("Jain Available")
+        );
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col bg-[#FDFBF7] text-slate-800 font-sans">
+          
+          {/* ================= HEADER & NAVIGATION ================= */}
+          <header className="sticky top-0 z-50 bg-[#FDFBF7]/90 backdrop-blur-md border-b border-amber-100/60 shadow-xs">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+              
+              {/* Logo Brand */}
+              <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('home')}>
+                <div className="w-10 h-10 rounded-full bg-amber-600 flex items-center justify-center shadow-md">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="font-serif text-xl sm:text-2xl font-bold tracking-wide text-amber-900 block leading-tight">FLAVOR HORIZON</span>
+                  <span className="text-[10px] tracking-widest text-amber-700 uppercase font-semibold block">Mumbai • Multi-Cuisine</span>
+                </div>
+              </div>
+
+              {/* Desktop Nav Links */}
+              <nav className="hidden md:flex space-x-1 lg:space-x-2 text-sm font-medium">
+                <button 
+                  onClick={() => setActiveTab('home')} 
+                  className={`px-3 py-2 rounded-md transition-colors ${activeTab === 'home' ? 'text-amber-800 bg-amber-50' : 'text-slate-600 hover:text-amber-800'}`}
+                >
+                  Home
+                </button>
+                <button 
+                  onClick={() => setActiveTab('menu')} 
+                  className={`px-3 py-2 rounded-md transition-colors ${activeTab === 'menu' ? 'text-amber-800 bg-amber-50' : 'text-slate-600 hover:text-amber-800'}`}
+                >
+                  10-Page Menu
+                </button>
+                <button 
+                  onClick={() => setActiveTab('interior')} 
+                  className={`px-3 py-2 rounded-md transition-colors ${activeTab === 'interior' ? 'text-amber-800 bg-amber-50' : 'text-slate-600 hover:text-amber-800'}`}
+                >
+                  Clean Interiors
+                </button>
+                <button 
+                  onClick={() => setActiveTab('reservation')} 
+                  className={`px-3 py-2 rounded-md transition-colors ${activeTab === 'reservation' ? 'text-amber-800 bg-amber-50' : 'text-slate-600 hover:text-amber-800'}`}
+                >
+                  Reservations
+                </button>
+                <button 
+                  onClick={() => setActiveTab('contact')} 
+                  className={`px-3 py-2 rounded-md transition-colors ${activeTab === 'contact' ? 'text-amber-800 bg-amber-50' : 'text-slate-600 hover:text-amber-800'}`}
+                >
+                  Contact & Hours
+                </button>
+              </nav>
+
+              {/* Action Buttons */}
+              <div className="flex items-center space-x-3">
+                <button 
+                  onClick={() => { setActiveTab('menu'); setJainFilter(!jainFilter); }} 
+                  className={`text-xs md:text-sm px-3 py-1.5 rounded-full border transition-all flex items-center space-x-1.5 font-medium ${
+                    jainFilter 
+                      ? 'bg-emerald-50 border-emerald-300 text-emerald-800' 
+                      : 'bg-white border-amber-200 text-slate-700 hover:border-amber-400'
+                  }`}
+                >
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block border border-white"></span>
+                  <span>Jain Menu {jainFilter ? 'Active' : 'Only'}</span>
+                </button>
+
+                <button 
+                  onClick={() => setActiveTab('reservation')} 
+                  className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-full text-xs md:text-sm font-semibold tracking-wide shadow-sm hover:shadow-md transition-all"
+                >
+                  Book Table
+                </button>
+              </div>
+            </div>
+          </header>
+
+          {/* Mobile Sticky Bottom Menu Bar */}
+          <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#FDFBF7] border-t border-amber-100 flex justify-around py-2 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] text-slate-600">
+            <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center space-y-0.5 ${activeTab === 'home' ? 'text-amber-700' : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              <span className="text-[10px]">Home</span>
+            </button>
+            <button onClick={() => setActiveTab('menu')} className={`flex flex-col items-center space-y-0.5 ${activeTab === 'menu' ? 'text-amber-700' : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <span className="text-[10px]">Menu</span>
+            </button>
+            <button onClick={() => setActiveTab('interior')} className={`flex flex-col items-center space-y-0.5 ${activeTab === 'interior' ? 'text-amber-700' : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <span className="text-[10px]">Interiors</span>
+            </button>
+            <button onClick={() => setActiveTab('reservation')} className={`flex flex-col items-center space-y-0.5 ${activeTab === 'reservation' ? 'text-amber-700' : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span className="text-[10px]">Reserve</span>
+            </button>
+            <button onClick={() => setActiveTab('contact')} className={`flex flex-col items-center space-y-0.5 ${activeTab === 'contact' ? 'text-amber-700' : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span className="text-[10px]">Contact</span>
+            </button>
+          </div>
+
+          {/* ================= MAIN CONTENT CONTAINER ================= */}
+          <main className="flex-grow pb-16 md:pb-0">
+
+            {/* ------------------ TAB: HOME ------------------ */}
+            {activeTab === 'home' && (
+              <div className="animate-fade-in">
+                {/* Elegant Hero Section */}
+                <section className="relative py-20 lg:py-32 bg-gradient-to-b from-[#FAF6EE] to-[#EFEAE2] overflow-hidden">
+                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+                    <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1" />
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill="url(#grid)" />
+                    </svg>
+                  </div>
+
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div className="space-y-6 text-center lg:text-left">
+                      <div className="inline-flex items-center space-x-2 bg-amber-50 border border-amber-200 px-3.5 py-1.5 rounded-full text-amber-900 text-xs sm:text-sm font-semibold tracking-wider uppercase">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Dedicated Jain Kitchen Integrated</span>
+                      </div>
+                      
+                      <h1 className="font-serif text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                        Where Mumbai Meets the <span className="text-amber-700 italic font-medium block sm:inline">Culinary Horizon</span>
+                      </h1>
+                      
+                      <p className="text-base sm:text-lg text-slate-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                        Flavor Horizon presents an exquisitely elevated Multi-Cuisine journey in the heart of Mumbai. Discover authentic Northern & Coastal Indian flavors alongside expertly hand-rolled Italian and vibrant Mexican menus.
+                      </p>
+
+                      <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                        <button 
+                          onClick={() => setActiveTab('menu')}
+                          className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-amber-700 hover:bg-amber-800 text-white font-semibold tracking-wide text-sm shadow-md hover:shadow-lg transition-all"
+                        >
+                          Explore 10-Page Menu
+                        </button>
+                        <button 
+                          onClick={() => setActiveTab('reservation')}
+                          className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-semibold tracking-wide text-sm transition-all"
+                        >
+                          Reserve Table
+                        </button>
+                      </div>
+
+                      <div className="pt-6 grid grid-cols-3 gap-4 border-t border-amber-100 max-w-md mx-auto lg:mx-0">
+                        <div>
+                          <span className="block font-serif text-2xl font-bold text-amber-800">4.8 ★</span>
+                          <span className="text-xs text-slate-500">Zomato Rating</span>
+                        </div>
+                        <div>
+                          <span className="block font-serif text-2xl font-bold text-amber-800">100%</span>
+                          <span className="text-xs text-slate-500">Vegetarian & Jain</span>
+                        </div>
+                        <div>
+                          <span className="block font-serif text-2xl font-bold text-amber-800">10 Pages</span>
+                          <span className="text-xs text-slate-500">Of Fine Choices</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right side Visual/Aesthetic representation */}
+                    <div className="relative">
+                      <div className="aspect-square max-w-[450px] mx-auto bg-white rounded-3xl p-6 shadow-2xl border border-amber-100 flex flex-col justify-between relative overflow-hidden">
+                        <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-amber-100/40 blur-3xl"></div>
+                        <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-emerald-50/40 blur-3xl"></div>
+
+                        <div className="flex justify-between items-start z-10">
+                          <div className="border-l-4 border-amber-600 pl-3">
+                            <span className="text-[10px] tracking-widest text-slate-400 block uppercase">Signature Choice</span>
+                            <span className="font-serif text-lg font-bold text-slate-800">Horizon Dal Bukhara</span>
+                          </div>
+                          <span className="text-amber-800 font-serif font-bold text-lg">₹ 445</span>
+                        </div>
+
+                        <div className="my-auto py-10 text-center z-10">
+                          <div className="inline-block w-24 h-24 rounded-full bg-amber-50 border-2 border-dashed border-amber-300 flex items-center justify-center text-amber-800 font-serif text-4xl mb-4 mx-auto animate-spin-slow">
+                            🥘
+                          </div>
+                          <h4 className="font-serif text-xl font-semibold text-slate-900">Slow Cooked for 24 Hours</h4>
+                          <p className="text-xs text-slate-500 mt-2 max-w-xs mx-auto">
+                            Simmered on coal fire with vine-ripened tomatoes, organic butter and fresh cream. Pure, creamy perfection.
+                          </p>
+                        </div>
+
+                        <div className="flex justify-between items-center z-10 pt-4 border-t border-dashed border-slate-200">
+                          <span className="text-xs text-slate-400">Order from our digital menu today</span>
+                          <span className="inline-flex items-center space-x-1 text-xs text-emerald-700 font-semibold bg-emerald-50 px-2 py-1 rounded-md">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span>Jain Safe</span>
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Floating Elements */}
+                      <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm p-4 rounded-2xl shadow-lg border border-amber-100 max-w-[200px] hidden sm:block">
+                        <p className="text-xs font-semibold text-slate-800">📍 Mumbai Core</p>
+                        <p className="text-[11px] text-slate-500 mt-1">Visit our clean-concept layout in Bandra West.</p>
+                      </div>
+
+                      <div className="absolute top-10 right-4 bg-white/95 backdrop-blur-sm p-3.5 rounded-2xl shadow-lg border border-amber-100 flex items-center space-x-3 hidden sm:flex">
+                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-lg">🍲</div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-800">Multi-Cuisine</p>
+                          <p className="text-[10px] text-slate-500">Indo, Ital, Mex fusion</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Cuisines Showcase Slider / Cards */}
+                <section className="py-16 bg-white border-y border-amber-100">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center max-w-2xl mx-auto mb-12">
+                      <h2 className="font-serif text-3xl font-bold text-slate-900">Three Distinct Gastronomies</h2>
+                      <p className="text-slate-600 mt-2">Crafted with fresh ingredients and served with ultimate aesthetic excellence.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      {/* Indian card */}
+                      <div className="bg-[#FAF8F5] p-8 rounded-2xl border border-amber-100 hover:shadow-lg transition-all flex flex-col justify-between group">
+                        <div>
+                          <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-2xl group-hover:bg-amber-100 transition-colors">🇮🇳</div>
+                          <h3 className="font-serif text-xl font-bold text-slate-900 mt-4">Elevated Indian Cuisine</h3>
+                          <p className="text-sm text-slate-600 mt-2">
+                            Fragrant tandoor appetizers, royal North-Indian saffron gravies, and coastal delights from the Konkan shore.
+                          </p>
+                        </div>
+                        <button 
+                          onClick={() => { setActiveTab('menu'); setMenuPageIndex(2); }} 
+                          className="text-amber-700 hover:text-amber-800 font-semibold text-xs mt-6 tracking-wider flex items-center space-x-1"
+                        >
+                          <span>VIEW INDIAN PAGES (PAGE 3, 6, 7)</span>
+                          <span>→</span>
+                        </button>
+                      </div>
+
+                      {/* Italian card */}
+                      <div className="bg-[#FAF8F5] p-8 rounded-2xl border border-amber-100 hover:shadow-lg transition-all flex flex-col justify-between group">
+                        <div>
+                          <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-2xl group-hover:bg-amber-100 transition-colors">🇮🇹</div>
+                          <h3 className="font-serif text-xl font-bold text-slate-900 mt-4">Artisanal Italian</h3>
+                          <p className="text-sm text-slate-600 mt-2">
+                            Authentic Italian handmade pasta, fresh basil pestos, rich risottos, and warm tomato bruschetta options with dedicated Jain variations.
+                          </p>
+                        </div>
+                        <button 
+                          onClick={() => { setActiveTab('menu'); setMenuPageIndex(3); }} 
+                          className="text-amber-700 hover:text-amber-800 font-semibold text-xs mt-6 tracking-wider flex items-center space-x-1"
+                        >
+                          <span>VIEW ITALIAN MENU (PAGE 4)</span>
+                          <span>→</span>
+                        </button>
+                      </div>
+
+                      {/* Mexican card */}
+                      <div className="bg-[#FAF8F5] p-8 rounded-2xl border border-amber-100 hover:shadow-lg transition-all flex flex-col justify-between group">
+                        <div>
+                          <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-2xl group-hover:bg-amber-100 transition-colors">🇲🇽</div>
+                          <h3 className="font-serif text-xl font-bold text-slate-900 mt-4">Vibrant Mexican</h3>
+                          <p className="text-sm text-slate-600 mt-2">
+                            Soft corn tacos, grilled quesadillas loaded with cheese, and hearty baked enchiladas paired with our rich house guacamole.
+                          </p>
+                        </div>
+                        <button 
+                          onClick={() => { setActiveTab('menu'); setMenuPageIndex(4); }} 
+                          className="text-amber-700 hover:text-amber-800 font-semibold text-xs mt-6 tracking-wider flex items-center space-x-1"
+                        >
+                          <span>VIEW MEXICAN MENU (PAGE 5)</span>
+                          <span>→</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Exclusive Jain Cuisine call-out */}
+                <section className="py-16 bg-[#F3EFE9]">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-md border border-amber-100/80 flex flex-col lg:flex-row items-center gap-8">
+                      <div className="lg:w-1/2 space-y-4">
+                        <span className="inline-flex items-center space-x-1.5 text-xs text-emerald-800 font-bold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                          <span>100% PURE JAIN PREPARATIONS AVAILABLE</span>
+                        </span>
+                        <h2 className="font-serif text-3xl sm:text-4xl font-bold text-slate-900 leading-tight">
+                          Mindful Dining with Separated Kitchen Operations
+                        </h2>
+                        <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                          At Flavor Horizon, we deeply respect our patrons' dietary preferences. We have implemented dual kitchen zones: one strictly operating under traditional Jain guidelines (using no onion, garlic, potatoes, or other root vegetables) with separate storage, pans, and chef utensils.
+                        </p>
+                        <p className="text-slate-600 text-sm">
+                          Our interactive 10-page menu lets you filter down instantly to safe Jain preparations across all categories, including mocktails, starters, main courses, and fusion desserts.
+                        </p>
+                        <div className="pt-2 flex flex-wrap gap-3">
+                          <span className="bg-slate-50 text-slate-700 text-xs px-3 py-1.5 rounded-full border border-slate-200">🌱 No Onion / Garlic</span>
+                          <span className="bg-slate-50 text-slate-700 text-xs px-3 py-1.5 rounded-full border border-slate-200">🥔 Zero Root Vegetables</span>
+                          <span className="bg-slate-50 text-slate-700 text-xs px-3 py-1.5 rounded-full border border-slate-200">🧑‍🍳 Certified Pure Prep</span>
+                        </div>
+                      </div>
+
+                      <div className="lg:w-1/2 w-full bg-[#FAF9F6] p-6 rounded-2xl border border-dashed border-amber-300">
+                        <h4 className="font-serif text-lg font-bold text-slate-800 mb-4 flex items-center space-x-2">
+                          <span>🌱 Highly Recommended Jain Dishes</span>
+                        </h4>
+                        <div className="space-y-3.5">
+                          <div className="flex justify-between items-start pb-2.5 border-b border-amber-100">
+                            <div>
+                              <h5 className="text-sm font-semibold text-slate-900">Sufiyana Paneer Tikka</h5>
+                              <p className="text-xs text-slate-500">Cashew-cream & fennel infused tandoor paneer blocks.</p>
+                            </div>
+                            <span className="text-xs font-bold text-amber-800">₹460</span>
+                          </div>
+                          <div className="flex justify-between items-start pb-2.5 border-b border-amber-100">
+                            <div>
+                              <h5 className="text-sm font-semibold text-slate-900">Jain Avocat Tacos</h5>
+                              <p className="text-xs text-slate-500">Soft taco shell with fresh avocado cubes & cilantro-lime dressing.</p>
+                            </div>
+                            <span className="text-xs font-bold text-amber-800">₹415</span>
+                          </div>
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h5 className="text-sm font-semibold text-slate-900">Kesar Shahi Paneer</h5>
+                              <p className="text-xs text-slate-500">Velvety saffron-scented cashew gravy (strictly no onion/garlic).</p>
+                            </div>
+                            <span className="text-xs font-bold text-amber-800">₹525</span>
+                          </div>
+                        </div>
+                        <div className="mt-5 text-center">
+                          <button 
+                            onClick={() => { setJainFilter(true); setActiveTab('menu'); setMenuPageIndex(8); }}
+                            className="bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-xs px-5 py-2.5 rounded-full transition-all"
+                          >
+                            Explore Dedicated Jain Page (Page 9)
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            )}
+
+            {/* ------------------ TAB: MENU (10-PAGE BOOK VIEWER) ------------------ */}
+            {activeTab === 'menu' && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
+                <div className="text-center max-w-3xl mx-auto mb-8">
+                  <span className="text-amber-700 font-semibold tracking-wider text-xs uppercase">Interactive Dining Experience</span>
+                  <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 mt-1">Our Signature 10-Page Menu</h1>
+                  <p className="text-slate-600 text-sm sm:text-base mt-2">
+                    Flip through our beautifully bound culinary book. Use the left/right arrows, the side navigator, or turn on the Jain filter to highlight customized diets.
+                  </p>
+                </div>
+
+                {/* Menu Controls Toolbar */}
+                <div className="bg-white border border-amber-100 rounded-2xl p-4 mb-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                  
+                  {/* Page indicator & quick select */}
+                  <div className="flex flex-wrap items-center justify-center gap-1.5">
+                    <span className="text-xs font-bold text-slate-500 mr-2 uppercase">Jump to:</span>
+                    {menuPages.map((page, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setMenuPageIndex(index)}
+                        className={`w-8 h-8 rounded-full text-xs font-semibold transition-all ${
+                          menuPageIndex === index 
+                            ? 'bg-amber-700 text-white shadow-sm' 
+                            : 'bg-[#FAF8F5] text-slate-700 hover:bg-amber-100'
+                        }`}
+                      >
+                        {page.pageNumber}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Jain Toggle switch */}
+                  <div className="flex items-center space-x-3 bg-[#FAF8F5] border border-amber-200/60 rounded-full px-4 py-2">
+                    <span className="text-xs font-semibold text-slate-700 flex items-center">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span>
+                      Filter Jain Friendly Option
+                    </span>
+                    <button
+                      onClick={() => setJainFilter(!jainFilter)}
+                      className={`w-12 h-6 flex items-center rounded-full p-0.5 transition-colors duration-300 ${
+                        jainFilter ? 'bg-emerald-600' : 'bg-slate-300'
+                      }`}
+                    >
+                      <div
+                        className={`bg-white w-5 h-5 rounded-full shadow-md transform duration-300 ${
+                          jainFilter ? 'translate-x-6' : 'translate-x-0'
+                        }`}
+                      ></div>
+                    </button>
+                  </div>
+
+                </div>
+
+                {/* THE 10-PAGE MENU BOOK SHELF */}
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                  
+                  {/* Quick Index Side Panel (Left column on large screens) */}
+                  <div className="lg:col-span-1 bg-[#FAF8F5] border border-amber-100 rounded-3xl p-6 hidden lg:block self-start">
+                    <h3 className="font-serif text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-amber-200/60 flex items-center justify-between">
+                      <span>Table of Contents</span>
+                      <span className="text-xs font-mono text-slate-400">10 Pgs</span>
+                    </h3>
+                    <ul className="space-y-2.5">
+                      {menuPages.map((page, idx) => (
+                        <li key={idx}>
+                          <button
+                            onClick={() => setMenuPageIndex(idx)}
+                            className={`w-full text-left text-xs font-medium py-2 px-3 rounded-lg transition-all flex items-center justify-between ${
+                              menuPageIndex === idx 
+                                ? 'bg-amber-700 text-white font-semibold' 
+                                : 'text-slate-600 hover:bg-amber-50 hover:text-amber-800'
+                            }`}
+                          >
+                            <span className="truncate">Page {page.pageNumber}: {page.title}</span>
+                            <span className={menuPageIndex === idx ? 'text-amber-200' : 'text-slate-400'}>
+                              →
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* The Actual Digital Book Cover & Pages Spread */}
+                  <div className="lg:col-span-3 flex flex-col space-y-6">
+                    
+                    {/* Book Layout Screen */}
+                    <div className="relative bg-white rounded-3xl shadow-xl border border-amber-100/80 p-6 sm:p-10 min-h-[550px] flex flex-col justify-between overflow-hidden">
+                      
+                      {/* Subtle Book Spine Effect at left corner */}
+                      <div className="absolute left-0 top-0 bottom-0 w-2.5 bg-gradient-to-r from-amber-900/10 to-transparent pointer-events-none"></div>
+
+                      {/* Ribbon Page Number Label */}
+                      <div className="absolute top-0 right-8 bg-amber-700 text-white font-serif font-semibold text-sm px-3.5 py-1.5 rounded-b-xl shadow-xs">
+                        Page {menuPages[menuPageIndex].pageNumber} of 10
+                      </div>
+
+                      {/* Header of Active Page */}
+                      <div className="border-b border-amber-100 pb-5 pt-4 sm:pt-0">
+                        <span className="text-xs text-amber-700 uppercase font-bold tracking-widest">{menuPages[menuPageIndex].subtitle}</span>
+                        <h2 className="font-serif text-2xl sm:text-3.5xl font-bold text-slate-900 mt-1">{menuPages[menuPageIndex].title}</h2>
+                        <p className="text-xs sm:text-sm text-slate-500 mt-2 italic leading-relaxed">
+                          {menuPages[menuPageIndex].description}
+                        </p>
+                      </div>
+
+                      {/* Menu Items for Active Page */}
+                      <div className="my-6 space-y-6">
+                        {getFilteredItems(menuPages[menuPageIndex].items).length === 0 ? (
+                          <div className="text-center py-12">
+                            <span className="text-3xl">🌱</span>
+                            <h4 className="font-serif text-lg font-semibold text-slate-700 mt-2">No Items on This Page match the Jain Filter</h4>
+                            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                              Try switching pages (especially Page 9: Dedicated Jain Horizon) or disable the filter to view all options.
+                            </p>
+                          </div>
+                        ) : (
+                          getFilteredItems(menuPages[menuPageIndex].items).map((item, itemIdx) => (
+                            <div key={itemIdx} className="group flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2.5 pb-5 border-b border-dashed border-slate-200 last:border-0 last:pb-0">
+                              <div className="space-y-1 max-w-xl">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <h4 className="font-serif text-base sm:text-lg font-bold text-slate-900 group-hover:text-amber-800 transition-colors">
+                                    {item.name}
+                                  </h4>
+                                  
+                                  {/* Tag rendering */}
+                                  {item.tags.map((tag, tagIdx) => (
+                                    <span 
+                                      key={tagIdx} 
+                                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                                        tag === 'Jain' 
+                                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
+                                          : tag === 'Jain Available'
+                                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                                          : tag === 'Chef\'s Special'
+                                          ? 'bg-amber-100 text-amber-800'
+                                          : 'bg-slate-100 text-slate-600'
+                                      }`}
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                                <p className="text-xs text-slate-500 leading-relaxed">
+                                  {item.desc}
+                                </p>
+                              </div>
+                              <div className="text-left sm:text-right">
+                                <span className="font-serif text-sm sm:text-lg font-semibold text-amber-900 bg-amber-50/50 sm:bg-transparent px-2.5 py-1 rounded-md sm:p-0">
+                                  ₹ {item.price}
+                                </span>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+
+                      {/* Navigation Footer Inside Book */}
+                      <div className="flex items-center justify-between pt-6 border-t border-amber-100 text-xs font-semibold text-slate-500">
+                        <button
+                          disabled={menuPageIndex === 0}
+                          onClick={() => setMenuPageIndex(prev => prev - 1)}
+                          className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg transition-all ${
+                            menuPageIndex === 0 
+                              ? 'opacity-30 cursor-not-allowed' 
+                              : 'hover:bg-slate-50 text-amber-800'
+                          }`}
+                        >
+                          <span>← Previous Page</span>
+                        </button>
+
+                        <span className="text-slate-400 font-mono hidden sm:inline">
+                          Flavor Horizon Digital Menu v2.6
+                        </span>
+
+                        <button
+                          disabled={menuPageIndex === menuPages.length - 1}
+                          onClick={() => setMenuPageIndex(prev => prev + 1)}
+                          className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg transition-all ${
+                            menuPageIndex === menuPages.length - 1 
+                              ? 'opacity-30 cursor-not-allowed' 
+                              : 'hover:bg-slate-50 text-amber-800'
+                          }`}
+                        >
+                          <span>Next Page →</span>
+                        </button>
+                      </div>
+
+                    </div>
+
+                    {/* Additional Note on Dietary Separation */}
+                    <div className="bg-emerald-50/60 rounded-2xl p-4 border border-emerald-200/80 flex items-start space-x-3">
+                      <div className="text-xl">🧑‍🍳</div>
+                      <div>
+                        <h5 className="text-xs font-bold text-emerald-950">Dietary Guarantee</h5>
+                        <p className="text-[11px] text-emerald-800 mt-0.5 leading-relaxed">
+                          All Jain items listed above are prepared by trained chefs with fresh chopping boards, separate utensils, and sterilized equipment. We understand the sanctity of dietary choices and ensure strict adherence in our Mumbai premises.
+                        </p>
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+            )}
+
+            {/* ------------------ TAB: RESERVATION ------------------ */}
+            {activeTab === 'reservation' && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
+                <div className="text-center max-w-2xl mx-auto mb-10">
+                  <span className="text-amber-700 font-semibold tracking-wider text-xs uppercase">Secure Your Experience</span>
+                  <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 mt-1">Book Your Table</h1>
+                  <p className="text-slate-600 text-sm sm:text-base mt-2">
+                    Join us at our stylish Bandra West restaurant. Secure a custom dining space, select food preferences, and receive real-time confirmation.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                  
+                  {/* Left Column: Form */}
+                  <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-10 shadow-lg border border-amber-100">
+                    {!isBooked ? (
+                      <form onSubmit={handleBookTable} className="space-y-6">
+                        <h3 className="font-serif text-xl font-bold text-slate-900 border-b border-amber-100 pb-3">
+                          Reservation Details
+                        </h3>
+
+                        {bookingError && (
+                          <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center space-x-2">
+                            <span>⚠️</span>
+                            <span>{bookingError}</span>
+                          </div>
+                        )}
+
+                        {/* Standard Inputs */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Full Name *</label>
+                            <input
+                              type="text"
+                              value={reserveName}
+                              onChange={(e) => setReserveName(e.target.value)}
+                              placeholder="Your Name"
+                              className="w-full bg-[#FAF8F5] border border-amber-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-600"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Phone Number *</label>
+                            <input
+                              type="tel"
+                              value={reservePhone}
+                              onChange={(e) => setReservePhone(e.target.value)}
+                              placeholder="Mobile Number"
+                              className="w-full bg-[#FAF8F5] border border-amber-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-600"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Date *</label>
+                            <input
+                              type="date"
+                              required
+                              value={reserveDate}
+                              onChange={(e) => setReserveDate(e.target.value)}
+                              className="w-full bg-[#FAF8F5] border border-amber-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-600"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Preferred Time *</label>
+                            <select
+                              value={reserveTime}
+                              onChange={(e) => setReserveTime(e.target.value)}
+                              className="w-full bg-[#FAF8F5] border border-amber-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-600"
+                            >
+                              <option value="12:00">12:00 PM (Lunch)</option>
+                              <option value="13:00">01:00 PM (Lunch)</option>
+                              <option value="14:00">02:00 PM (Lunch)</option>
+                              <option value="19:00">07:00 PM (Dinner)</option>
+                              <option value="19:30">07:30 PM (Dinner)</option>
+                              <option value="20:00">08:00 PM (Dinner)</option>
+                              <option value="21:00">09:00 PM (Dinner)</option>
+                              <option value="22:00">10:00 PM (Dinner)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase">Guests *</label>
+                            <select
+                              value={reserveGuests}
+                              onChange={(e) => setReserveGuests(e.target.value)}
+                              className="w-full bg-[#FAF8F5] border border-amber-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-600"
+                            >
+                              <option value="1">1 Person</option>
+                              <option value="2">2 People</option>
+                              <option value="3">3 People</option>
+                              <option value="4">4 People</option>
+                              <option value="6">6 People</option>
+                              <option value="8">8+ People (Event)</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Zone selection */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-600 mb-2 uppercase">Preferred Interior Seating Zone</label>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                            {['Standard', 'Window Side', 'Private Pod', 'Terrace'].map((zone) => (
+                              <button
+                                type="button"
+                                key={zone}
+                                onClick={() => setReserveZone(zone)}
+                                className={`py-2.5 rounded-xl text-xs font-semibold border transition-all ${
+                                  reserveZone === zone 
+                                    ? 'bg-amber-700 text-white border-amber-700' 
+                                    : 'bg-[#FAF8F5] text-slate-600 border-amber-100 hover:border-amber-300'
+                                }`}
+                              >
+                                {zone}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Food Prep Preference */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-600 mb-2 uppercase">Dietary Focus / Kitchen Preparation</label>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button
+                              type="button"
+                              onClick={() => setReserveFoodType('Standard')}
+                              className={`p-3.5 rounded-xl border text-left transition-all flex items-start space-x-2.5 ${
+                                reserveFoodType === 'Standard' 
+                                  ? 'bg-amber-50/80 border-amber-500 text-amber-950' 
+                                  : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                              }`}
+                            >
+                              <span className="text-xl">🍽️</span>
+                              <div>
+                                <span className="block text-xs font-bold">Standard Multi-Cuisine</span>
+                                <span className="block text-[10px] text-slate-400 mt-0.5">Indian, Italian, Mexican</span>
+                              </div>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setReserveFoodType('Jain Preferred')}
+                              className={`p-3.5 rounded-xl border text-left transition-all flex items-start space-x-2.5 ${
+                                reserveFoodType === 'Jain Preferred' 
+                                  ? 'bg-emerald-50/80 border-emerald-500 text-emerald-950' 
+                                  : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                              }`}
+                            >
+                              <span className="text-xl">🌱</span>
+                              <div>
+                                <span className="block text-xs font-bold">Strict Jain Preparation</span>
+                                <span className="block text-[10px] text-emerald-700/80 mt-0.5">Prepared in isolated kitchen zone</span>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-sm uppercase tracking-wider"
+                        >
+                          Book Tomorrow's Table
+                        </button>
+                      </form>
+                    ) : (
+                      /* Booking Success Screen */
+                      <div className="text-center py-10 space-y-6">
+                        <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-3xl mx-auto">
+                          ✓
+                        </div>
+                        <div>
+                          <h3 className="font-serif text-2xl font-bold text-slate-900">Table Reserved Successfully!</h3>
+                          <p className="text-sm text-slate-600 mt-1">We look forward to hosting you at Flavor Horizon, Mumbai.</p>
+                        </div>
+
+                        <div className="bg-[#FAF8F5] border border-amber-100 rounded-2xl p-6 max-w-md mx-auto text-left space-y-3.5">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-slate-400">Booking Reference:</span>
+                            <span className="font-mono font-bold text-amber-900">{bookingRef}</span>
+                          </div>
+                          <div className="flex justify-between text-xs border-t border-amber-100/60 pt-2">
+                            <span className="text-slate-400">Guest Name:</span>
+                            <span className="font-semibold text-slate-800">{reserveName}</span>
+                          </div>
+                          <div className="flex justify-between text-xs border-t border-amber-100/60 pt-2">
+                            <span className="text-slate-400">Date & Time:</span>
+                            <span className="font-semibold text-slate-800">{reserveDate} at {reserveTime}</span>
+                          </div>
+                          <div className="flex justify-between text-xs border-t border-amber-100/60 pt-2">
+                            <span className="text-slate-400">Table Zone:</span>
+                            <span className="font-semibold text-slate-800">{reserveZone}</span>
+                          </div>
+                          <div className="flex justify-between text-xs border-t border-amber-100/60 pt-2">
+                            <span className="text-slate-400">Special Setup:</span>
+                            <span className={`font-semibold ${reserveFoodType === 'Jain Preferred' ? 'text-emerald-700 font-bold' : 'text-slate-800'}`}>
+                              {reserveFoodType === 'Jain Preferred' ? '🌱 Separated Jain Kitchen' : 'Standard'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
+                          A confirmation SMS and coordinate directions to Bandra West have been simulated and sent to <b>{reservePhone}</b>.
+                        </p>
+
+                        <button
+                          onClick={resetBooking}
+                          className="px-6 py-2.5 rounded-full border border-amber-300 text-amber-800 font-semibold text-xs hover:bg-amber-50/50 transition-all"
+                        >
+                          Book Another Table
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right Column: Seating Guide / Interior Vibe */}
+                  <div className="lg:col-span-5 space-y-6">
+                    <div className="bg-[#FAF8F5] border border-amber-100 rounded-3xl p-6 space-y-4">
+                      <h3 className="font-serif text-lg font-bold text-amber-950">Bandra West Seating Guidelines</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        Our restaurant's visual layout is optimized for serene acoustic balance, ample walking space, and high privacy. Check our seating configurations below:
+                      </p>
+
+                      <div className="space-y-3">
+                        <div className="bg-white p-3.5 rounded-xl border border-slate-100">
+                          <span className="font-serif font-bold text-xs text-slate-800 block">🪟 Window Side Alcoves</span>
+                          <span className="text-[10px] text-slate-400 block mt-0.5">Flanked by floor-to-ceiling glass paneling looking onto tranquil foliage. Perfect for couples.</span>
+                        </div>
+
+                        <div className="bg-white p-3.5 rounded-xl border border-slate-100">
+                          <span className="font-serif font-bold text-xs text-slate-800 block">🛋️ Standard Lounge</span>
+                          <span className="text-[10px] text-slate-400 block mt-0.5">Minimalist plush velvet sofas surrounding marble tables. Great for medium families.</span>
+                        </div>
+
+                        <div className="bg-white p-3.5 rounded-xl border border-slate-100">
+                          <span className="font-serif font-bold text-xs text-slate-800 block">🌿 Rooftop Terrace</span>
+                          <span className="text-[10px] text-slate-400 block mt-0.5">Open-air cozy seating with subtle candle-lit ambiance and light modern breeze.</span>
+                        </div>
+
+                        <div className="bg-white p-3.5 rounded-xl border border-slate-100">
+                          <span className="font-serif font-bold text-xs text-slate-800 block">🧱 Private Dining Pods</span>
+                          <span className="text-[10px] text-slate-400 block mt-0.5">Fully enclosed geometric marble structures for intimate business meetups or private family events.</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-[#FAF6EE] p-5 rounded-2xl border border-dashed border-amber-300">
+                      <h4 className="text-xs font-bold text-amber-900 uppercase">🎂 Celebrating an Event?</h4>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                        We can organize customized eggless / Jain desserts, personalized table decor, and customized menus. Let our staff know upon receiving our callback confirmation.
+                      </p>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+            )}
+
+            {/* ------------------ TAB: INTERIOR ------------------ */}
+            {activeTab === 'interior' && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
+                <div className="text-center max-w-2xl mx-auto mb-10">
+                  <span className="text-amber-700 font-semibold tracking-wider text-xs uppercase">Design Concept</span>
+                  <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 mt-1">Clean & Serene Interior</h1>
+                  <p className="text-slate-600 text-sm sm:text-base mt-2">
+                    We believe dining is an all-sensory experience. Flavor Horizon's visual architecture balances clean geometry, premium Italian marble, warm concealed lighting, and subtle lush flora.
+                  </p>
+                </div>
+
+                {/* Visual Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  
+                  {/* Feature 1 */}
+                  <div className="bg-white rounded-3xl overflow-hidden shadow-xs border border-amber-100 flex flex-col justify-between">
+                    <div className="p-8 space-y-4">
+                      <div className="h-44 bg-gradient-to-br from-[#FAF5EC] to-[#EFEAE1] rounded-2xl flex items-center justify-center text-4xl relative overflow-hidden border border-amber-100/50">
+                        <span className="relative z-10">🏛️</span>
+                      </div>
+                      <h3 className="font-serif text-xl font-bold text-slate-900">Italian Marble & Terrazzo Floors</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        Polished light travertine stones form the foundation of our clean spatial flow. Seamless borders prevent cluttered lines, accentuating natural light paths throughout Bandra's dining hall.
+                      </p>
+                    </div>
+                    <div className="px-8 pb-6 text-[10px] uppercase tracking-widest text-slate-400 border-t border-slate-100 pt-3.5">
+                      Visual Depth • 01
+                    </div>
+                  </div>
+
+                  {/* Feature 2 */}
+                  <div className="bg-white rounded-3xl overflow-hidden shadow-xs border border-amber-100 flex flex-col justify-between">
+                    <div className="p-8 space-y-4">
+                      <div className="h-44 bg-gradient-to-br from-[#FAF5EC] to-[#EFEAE1] rounded-2xl flex items-center justify-center text-4xl relative overflow-hidden border border-amber-100/50">
+                        <span className="relative z-10">💡</span>
+                      </div>
+                      <h3 className="font-serif text-xl font-bold text-slate-900">Concealed Warm Luminescence</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        We strictly avoid aggressive downlighting. Soft 2700K indirect amber LEDs are custom-curved within architectural ceiling recesses, mimicking the gentle rays of a sunset horizon.
+                      </p>
+                    </div>
+                    <div className="px-8 pb-6 text-[10px] uppercase tracking-widest text-slate-400 border-t border-slate-100 pt-3.5">
+                      Atmospheric Balance • 02
+                    </div>
+                  </div>
+
+                  {/* Feature 3 */}
+                  <div className="bg-white rounded-3xl overflow-hidden shadow-xs border border-amber-100 flex flex-col justify-between">
+                    <div className="p-8 space-y-4">
+                      <div className="h-44 bg-gradient-to-br from-[#FAF5EC] to-[#EFEAE1] rounded-2xl flex items-center justify-center text-4xl relative overflow-hidden border border-amber-100/50">
+                        <span className="relative z-10">🌿</span>
+                      </div>
+                      <h3 className="font-serif text-xl font-bold text-slate-900">Lush Biophilic Segregations</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        Instead of artificial walls, we separate tables using structured wooden boxes containing purifying houseplants like snake plants, money plants, and delicate ferns.
+                      </p>
+                    </div>
+                    <div className="px-8 pb-6 text-[10px] uppercase tracking-widest text-slate-400 border-t border-slate-100 pt-3.5">
+                      Natural Privacy • 03
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Atmosphere Details */}
+                <div className="mt-12 bg-[#FAF8F5] rounded-3xl p-8 border border-amber-100">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div className="space-y-4">
+                      <h3 className="font-serif text-2xl font-bold text-slate-900">Our Clean Dining Manifesto</h3>
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        "Minimalism isn't the absence of design; it's the perfect harmony of essential details." Our space in Mumbai is meticulously curated to feel open, airy, and free of typical restaurant clutter. From pristine organic cotton napkins to acoustic panels that muffle chatter, we prioritize quiet elegance.
+                      </p>
+                      
+                      <div className="space-y-2 text-xs text-slate-500 font-semibold">
+                        <div className="flex items-center space-x-2">
+                          <span className="w-2 h-2 rounded-full bg-amber-600"></span>
+                          <span>Spacious 1.5-meter distance between all dining setups</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="w-2 h-2 rounded-full bg-amber-600"></span>
+                          <span>Dedicated HEPA-purified indoor ventilation system</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="w-2 h-2 rounded-full bg-amber-600"></span>
+                          <span>Open-concept plating pass where guests can observe pristine hygienic handling</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Blueprint Mockup */}
+                    <div className="bg-white p-6 rounded-2xl border border-amber-200/80 shadow-xs space-y-4">
+                      <span className="text-[10px] tracking-widest text-amber-700 uppercase font-bold block">Digital Blueprint Mockup</span>
+                      <div className="border border-slate-200 rounded-xl p-4 flex flex-col justify-between h-48 bg-[#FCFCFA] relative overflow-hidden">
+                        <div className="flex justify-between items-center text-[10px] font-mono text-slate-400 z-10">
+                          <span>SCALE: 1:50</span>
+                          <span>ZONE: BANDRA WEST MAIN</span>
+                        </div>
+
+                        <div className="flex justify-around items-center py-6 z-10">
+                          <div className="border border-dashed border-amber-400 p-2.5 rounded text-center text-[10px] bg-amber-50">
+                            <span className="block font-bold">KITCHEN A</span>
+                            <span className="text-slate-400">Multi Cuisine</span>
+                          </div>
+                          <div className="border border-dashed border-emerald-400 p-2.5 rounded text-center text-[10px] bg-emerald-50">
+                            <span className="block font-bold">KITCHEN B</span>
+                            <span className="text-emerald-700 font-bold">Isolated Jain</span>
+                          </div>
+                          <div className="border border-dashed border-slate-400 p-2.5 rounded text-center text-[10px] bg-slate-50">
+                            <span className="block font-bold">DINING AREA</span>
+                            <span className="text-slate-400">Clean Layout</span>
+                          </div>
+                        </div>
+
+                        <div className="text-center text-[9px] text-slate-400 font-mono z-10">
+                          *Separated entry gates for raw materials prevent intersection of supplies
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+            {/* ------------------ TAB: CONTACT & HOURS ------------------ */}
+            {activeTab === 'contact' && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
+                <div className="text-center max-w-2xl mx-auto mb-10">
+                  <span className="text-amber-700 font-semibold tracking-wider text-xs uppercase">Connect With Us</span>
+                  <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 mt-1">Location & Contact</h1>
+                  <p className="text-slate-600 text-sm sm:text-base mt-2">
+                    Situated in the prime shopping and residential hub of Bandra West, Mumbai. Drop by, or reach out to us for special event catering.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                  
+                  {/* Address / Contact details column */}
+                  <div className="lg:col-span-4 bg-[#FAF8F5] border border-amber-100 rounded-3xl p-6 sm:p-8 space-y-6 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-serif text-xl font-bold text-slate-900 mb-4 pb-2 border-b border-amber-100">Our Premises</h3>
+                      
+                      <div className="space-y-4">
+                        <div className="flex items-start space-x-3 text-sm">
+                          <span className="text-lg">📍</span>
+                          <div>
+                            <strong className="block text-slate-800">Flavor Horizon Mumbai</strong>
+                            <span className="text-slate-500 leading-relaxed text-xs block mt-0.5">
+                              Level 1 & 2, Horizon Towers, Off Linking Road, Bandra West, Mumbai - 400050.
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start space-x-3 text-sm">
+                          <span className="text-lg">📞</span>
+                          <div>
+                            <strong className="block text-slate-800">Phone Reservations</strong>
+                            <span className="text-slate-500 text-xs block mt-0.5">+91 22 2649 8811</span>
+                            <span className="text-slate-500 text-xs block">+91 98200 98200</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start space-x-3 text-sm">
+                          <span className="text-lg">✉️</span>
+                          <div>
+                            <strong className="block text-slate-800">E-mail Correspondence</strong>
+                            <span className="text-slate-500 text-xs block mt-0.5">dine@flavorhorizon.in</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-amber-200/60">
+                      <h4 className="font-serif text-base font-bold text-slate-800 mb-3">Operating Hours</h4>
+                      <ul className="space-y-1.5 text-xs text-slate-600">
+                        <div className="flex justify-between">
+                          <span>Monday - Friday (Lunch):</span>
+                          <span className="font-semibold">12:00 PM - 03:30 PM</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Monday - Friday (Dinner):</span>
+                          <span className="font-semibold">07:00 PM - 11:30 PM</span>
+                        </div>
+                        <div className="flex justify-between border-t border-slate-200/50 pt-1.5">
+                          <span className="font-bold text-slate-800">Saturday & Sunday:</span>
+                          <span className="font-bold text-amber-900">12:00 PM - 12:00 AM (Nonstop)</span>
+                        </div>
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Message Input form */}
+                  <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-amber-100 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-serif text-xl font-bold text-slate-900 mb-2">Drop us a Message</h3>
+                      <p className="text-xs text-slate-400 mb-6">Have an inquiry regarding wedding caterings, private pods, or custom Jain menus? Write to us directly.</p>
+
+                      {isContactSent ? (
+                        <div className="bg-emerald-50 text-emerald-800 p-6 rounded-2xl border border-emerald-100 text-center space-y-2">
+                          <span className="text-3xl">✉️</span>
+                          <h4 className="font-bold text-sm">Message Transmitted!</h4>
+                          <p className="text-xs text-emerald-700">Thank you. Our Mumbai desk manager will call/email you within 12 hours.</p>
+                        </div>
+                      ) : (
+                        <form onSubmit={handleContactSubmit} className="space-y-4">
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Your Name</label>
+                            <input
+                              type="text"
+                              required
+                              value={contactName}
+                              onChange={(e) => setContactName(e.target.value)}
+                              placeholder="E.g. Siddharth Shah"
+                              className="w-full bg-[#FAF8F5] border border-amber-200/60 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-amber-600"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Your Email</label>
+                            <input
+                              type="email"
+                              required
+                              value={contactEmail}
+                              onChange={(e) => setContactEmail(e.target.value)}
+                              placeholder="siddharth@shah.com"
+                              className="w-full bg-[#FAF8F5] border border-amber-200/60 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-amber-600"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">How can we help you?</label>
+                            <textarea
+                              required
+                              rows="3"
+                              value={contactMessage}
+                              onChange={(e) => setContactMessage(e.target.value)}
+                              placeholder="Type your message..."
+                              className="w-full bg-[#FAF8F5] border border-amber-200/60 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-amber-600"
+                            ></textarea>
+                          </div>
+
+                          <button
+                            type="submit"
+                            className="w-full bg-slate-950 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl transition-all text-xs uppercase tracking-wider"
+                          >
+                            Send Inquiry
+                          </button>
+                        </form>
+                      )}
+                    </div>
+
+                    <div className="text-[10px] text-slate-400 text-center mt-4">
+                      We reply promptly. To make reservation modifications, please phone our desk directly.
+                    </div>
+                  </div>
+
+                  {/* Map Mockup */}
+                  <div className="lg:col-span-3 bg-white rounded-3xl border border-amber-100 p-6 flex flex-col justify-between items-stretch">
+                    <div className="space-y-4 h-full flex flex-col justify-between">
+                      <div>
+                        <h3 className="font-serif text-lg font-bold text-slate-900 mb-1">Mumbai Map</h3>
+                        <span className="text-[10px] text-slate-400 block uppercase">Transit & Access</span>
+                      </div>
+
+                      {/* Visual Map Simulator */}
+                      <div className="flex-grow my-4 border border-amber-100 rounded-2xl bg-gradient-to-br from-amber-50/20 to-stone-100/50 relative overflow-hidden flex flex-col items-center justify-center p-4 text-center min-h-[180px]">
+                        <div className="z-10">
+                          <span className="text-2xl block">📍</span>
+                          <strong className="text-xs text-slate-800 block mt-1.5">Bandra West Hub</strong>
+                          <p className="text-[9px] text-slate-500 max-w-[130px] mx-auto mt-0.5">
+                            Off Linking Road, next to designer boutiques. Valet Parking is free for dinner bookings.
+                          </p>
+                        </div>
+
+                        <div className="absolute bottom-2 left-2 right-2 flex justify-between text-[8px] font-mono text-slate-400">
+                          <span>19.05° N</span>
+                          <span>72.82° E</span>
+                        </div>
+                      </div>
+
+                      <a 
+                        href="https://maps.google.com" 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="block text-center border border-amber-200 hover:border-amber-400 bg-amber-50/25 py-2 rounded-xl text-xs font-semibold text-amber-800 transition-all"
+                      >
+                        Open Google Maps
+                      </a>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            )}
+
+          </main>
+
+          {/* ================= FOOTER ================= */}
+          <footer className="bg-slate-900 text-slate-300 py-12 px-4 sm:px-6 lg:px-8 border-t border-slate-800">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+              
+              <div className="space-y-4">
+                <span className="font-serif text-lg font-bold tracking-wide text-white block">FLAVOR HORIZON</span>
+                <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
+                  The premium culinary destination in Bandra West, Mumbai, showcasing beautiful Multi-Cuisine options alongside an independently managed 100% pure Jain kitchen block.
+                </p>
+                <div className="flex space-x-3 text-xs text-amber-500">
+                  <span>Instagram</span>
+                  <span>•</span>
+                  <span>Zomato</span>
+                  <span>•</span>
+                  <span>Google Reviews</span>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Cuisine Spread</h4>
+                <ul className="space-y-2 text-xs">
+                  <li><button onClick={() => { setActiveTab('menu'); setMenuPageIndex(2); }} className="hover:text-white">North & South Indian (Pg 3, 6, 7)</button></li>
+                  <li><button onClick={() => { setActiveTab('menu'); setMenuPageIndex(3); }} className="hover:text-white">Artisanal Italian Pasta (Pg 4)</button></li>
+                  <li><button onClick={() => { setActiveTab('menu'); setMenuPageIndex(4); }} className="hover:text-white">Mexican Enchiladas & Tacos (Pg 5)</button></li>
+                  <li><button onClick={() => { setActiveTab('menu'); setMenuPageIndex(8); }} className="hover:text-white text-emerald-400">Dedicated Pure Jain Menu (Pg 9)</button></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Aesthetic Concept</h4>
+                <ul className="space-y-2 text-xs text-slate-400">
+                  <li>Concealed Sunset lighting</li>
+                  <li>Travertine stone tiles</li>
+                  <li>HEPA Purified ventilation</li>
+                  <li>Private Pod configurations</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Corporate & Events</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Planning a banquet or private anniversary in Mumbai? Contact us directly for exclusive bookings of our premium dining zones or private pods.
+                </p>
+              </div>
+
+            </div>
+
+            <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-slate-800 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <span>© 2026 Flavor Horizon Pvt. Ltd. Bandra West, Mumbai. All Rights Reserved.</span>
+              <div className="flex space-x-4">
+                <span className="hover:text-white cursor-pointer">Privacy Protocol</span>
+                <span className="hover:text-white cursor-pointer">Hygiene Guidelines</span>
+              </div>
+            </div>
+          </footer>
+
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
